@@ -36,7 +36,7 @@ public class ImageService {
 
     public ImageService(
             GalleryImageRepository galleryImageRepository,
-            @Value("${image.upload-dir:data/uploads}") String uploadDir
+            @Value("${image.upload-dir:uploads}") String uploadDir
     ) {
         this.galleryImageRepository = galleryImageRepository;
         this.uploadDirectory = Paths.get(uploadDir).toAbsolutePath().normalize();

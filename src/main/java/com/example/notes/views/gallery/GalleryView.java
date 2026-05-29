@@ -11,6 +11,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.SucceededEvent;
@@ -90,7 +91,7 @@ public class GalleryView extends VerticalLayout {
         heading.getStyle().set("margin-bottom", "0");
 
         galleryGrid.setWidthFull();
-        galleryGrid.setWrapMode(FlexLayout.WrapMode.WRAP);
+        galleryGrid.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         galleryGrid.setFlexDirection(FlexLayout.FlexDirection.ROW);
         galleryGrid.setJustifyContentMode(JustifyContentMode.START);
         galleryGrid.setAlignItems(Alignment.START);
