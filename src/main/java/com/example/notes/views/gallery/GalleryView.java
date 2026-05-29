@@ -16,14 +16,16 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.InputStream;
 
-@Route(value = "gallery", layout = MainLayout.class)
-@PageTitle("Gallery | Vaadin Notes App")
+@Route(value = "", layout = MainLayout.class)
+@RouteAlias("gallery")
+@PageTitle("Gallery | Image Upload Gallery")
 @PermitAll
 public class GalleryView extends VerticalLayout {
 

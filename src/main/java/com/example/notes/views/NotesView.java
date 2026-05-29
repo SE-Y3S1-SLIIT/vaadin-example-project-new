@@ -18,8 +18,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.annotation.security.PermitAll;
 
-@Route(value = "", layout = MainLayout.class)
-@PageTitle("Notes | Vaadin Notes App")
+@Route(value = "notes", layout = MainLayout.class)
+@PageTitle("Home | Image Upload Gallery")
 @PermitAll
 public class NotesView extends VerticalLayout {
 

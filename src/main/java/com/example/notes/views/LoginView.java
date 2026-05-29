@@ -11,7 +11,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route("login")
-@PageTitle("Login | Vaadin Notes App")
+@PageTitle("Login | Image Upload Gallery")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
@@ -25,7 +25,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         login.setAction("login");
 
-        add(new H1("Vaadin Notes App"), login, new RouterLink("Create an account", RegistrationView.class));
+        add(new H1("Image Upload Gallery"), login, new RouterLink("Create an account", RegistrationView.class));
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @Route("register")
-@PageTitle("Register | Vaadin Notes App")
+@PageTitle("Register | Image Upload Gallery")
 @AnonymousAllowed
 public class RegistrationView extends VerticalLayout {
 

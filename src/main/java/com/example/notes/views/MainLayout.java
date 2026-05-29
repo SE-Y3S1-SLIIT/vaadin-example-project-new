@@ -1,5 +1,6 @@
 package com.example.notes.views;
 
+import com.example.notes.views.gallery.GalleryView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -21,7 +22,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void createHeader() {
-        H1 logo = new H1("Vaadin Notes App");
+        H1 logo = new H1("Image Upload Gallery");
         logo.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.MEDIUM);
 
         Button logout = new Button("Log out", e -> authContext.logout());
@@ -36,6 +37,6 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
-        addToDrawer(new RouterLink("My Notes", NotesView.class));
+        addToDrawer(new RouterLink("Gallery", GalleryView.class));
     }
 }
