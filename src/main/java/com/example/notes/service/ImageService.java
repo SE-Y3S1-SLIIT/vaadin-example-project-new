@@ -97,6 +97,15 @@ public class ImageService {
         galleryImageRepository.delete(image);
     }
 
+    @Transactional
+    public GalleryImage updateImageTitle(GalleryImage image, String title) {
+        if (image == null || title == null || title.isBlank()) {
+            return image;
+        }
+        image.setTitle(title.trim());
+        return galleryImageRepository.save(image);
+    }
+
     private void validateUploadRequest(String originalFilename, String contentType, long size, InputStream inputStream, User user) {
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("A valid user is required to upload an image");
