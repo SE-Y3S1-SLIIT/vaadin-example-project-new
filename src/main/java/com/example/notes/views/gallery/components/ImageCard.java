@@ -22,6 +22,8 @@ import java.util.function.Consumer;
  */
 public class ImageCard extends VerticalLayout {
 
+    private static final String IMAGE_CONTENT_BASE_PATH = "/image-content/";
+
     private final GalleryImage image;
     private final Consumer<GalleryImage> onDeleteCallback;
     private final Consumer<GalleryImage> onSelectCallback;
@@ -243,6 +245,6 @@ public class ImageCard extends VerticalLayout {
         if (filename == null || filename.isBlank()) {
             return "";
         }
-        return "/image-content/" + filename;
+        return IMAGE_CONTENT_BASE_PATH + filename;
     }
 }

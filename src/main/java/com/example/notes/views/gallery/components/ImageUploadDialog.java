@@ -8,12 +8,10 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -22,9 +20,6 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import java.io.InputStream;
 import java.util.function.Consumer;
 
-/**
- * A premium modal dialog for uploading images with optional titles.
- */
 public class ImageUploadDialog extends Dialog {
 
     private static final int MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB

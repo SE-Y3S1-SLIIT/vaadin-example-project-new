@@ -18,21 +18,18 @@ import java.nio.file.Paths;
 @RestController
 public class ImageContentController {
 
+    private static final String IMAGE_CONTENT_ROUTE = "/image-content/{filename:.+}";
+
     private final Path uploadDirectory;
 
     public ImageContentController(@Value("${image.upload-dir:uploads}") String uploadDir) {
         this.uploadDirectory = Paths.get(uploadDir).toAbsolutePath().normalize();
     }
 
-    @GetMapping("/image-content/{filename:.+}")
+    @GetMapping(IMAGE_CONTENT_ROUTE)
     public ResponseEntity<Resource> getImageContent(@PathVariable String filename) {
-        String safeFilename = Paths.get(filename).getFileName().toString();
-        if (!safeFilename.equals(filename)) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Path imagePath = uploadDirectory.resolve(safeFilename).normalize();
-        if (!imagePath.startsWith(uploadDirectory) || !Files.exists(imagePath) || !Files.isReadable(imagePath)) {
+        Path imagePath = resolveSafeImagePath(filename);
+        if (imagePath == null || !Files.exists(imagePath) || !Files.isReadable(imagePath)) {
             return ResponseEntity.notFound().build();
         }
 
@@ -42,10 +39,7 @@ public class ImageContentController {
                 return ResponseEntity.notFound().build();
             }
 
-            String contentType = Files.probeContentType(imagePath);
-            MediaType mediaType = contentType != null
-                    ? MediaType.parseMediaType(contentType)
-                    : MediaType.APPLICATION_OCTET_STREAM;
+                MediaType mediaType = resolveMediaType(imagePath);
 
             return ResponseEntity.ok()
                     .contentType(mediaType)
@@ -53,6 +47,29 @@ public class ImageContentController {
                     .body(resource);
         } catch (IOException exception) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    private Path resolveSafeImagePath(String filename) {
+        String safeFilename = Paths.get(filename).getFileName().toString();
+        if (!safeFilename.equals(filename)) {
+            return null;
+        }
+
+        Path imagePath = uploadDirectory.resolve(safeFilename).normalize();
+        return imagePath.startsWith(uploadDirectory) ? imagePath : null;
+    }
+
+    private MediaType resolveMediaType(Path imagePath) throws IOException {
+        String contentType = Files.probeContentType(imagePath);
+        if (contentType == null || contentType.isBlank()) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
+
+        try {
+            return MediaType.parseMediaType(contentType);
+        } catch (IllegalArgumentException exception) {
+            return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
 }

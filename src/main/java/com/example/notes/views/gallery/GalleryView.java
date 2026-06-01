@@ -8,7 +8,6 @@ import com.example.notes.views.MainLayout;
 import com.example.notes.views.gallery.components.ImageCard;
 import com.example.notes.views.gallery.components.ImageUploadDialog;
 import com.example.notes.views.gallery.components.ImageChangedEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.button.Button;
@@ -17,7 +16,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -36,7 +34,6 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.File;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,6 +45,10 @@ import java.util.Optional;
 @PageTitle("Gallery | Image Upload Gallery")
 @PermitAll
 public class GalleryView extends HorizontalLayout implements BeforeEnterObserver {
+
+    private static final String IMAGE_CONTENT_BASE_PATH = "/image-content/";
+    private static final DateTimeFormatter DISPLAY_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
 
     private final ImageService imageService;
     private final User currentUser;
@@ -91,10 +92,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         buildSidebar();
         buildDetailsArea();
 
-        // Listen for gallery modifications in the session and refresh instantly
-        ComponentUtil.addListener(UI.getCurrent(), ImageChangedEvent.class, event -> {
-            refreshGallery();
-        });
+        ComponentUtil.addListener(UI.getCurrent(), ImageChangedEvent.class, event -> refreshGallery());
 
         refreshGallery();
     }
@@ -328,16 +326,14 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         previewCard.setVisible(true);
         emptyGalleryState.setVisible(false);
 
-        largeImagePreview.setSrc("/image-content/" + image.getFilename());
+        largeImagePreview.setSrc(buildImageContentUrl(image.getFilename()));
         largeImagePreview.setAlt(image.getTitle());
 
         imageTitle.setText(image.getTitle());
         metaFilename.setText(image.getFilename());
         metaType.setText(image.getContentType());
         
-        // Format uploaded date
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy 'at' h:mm a");
-        metaUploaded.setText(image.getUploadTime().format(formatter));
+        metaUploaded.setText(image.getUploadTime().format(DISPLAY_DATE_FORMATTER));
 
         // Dynamically compute exact file size from disk
         File file = new File(image.getFilepath());
@@ -347,7 +343,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
             metaSize.setText("Unknown size");
         }
 
-        downloadAnchor.setHref("/image-content/" + image.getFilename());
+        downloadAnchor.setHref(buildImageContentUrl(image.getFilename()));
     }
 
     private void showEmptyPreviewState() {
@@ -362,7 +358,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         lightbox.setWidth("90vw");
         lightbox.setHeight("90vh");
 
-        Image fullImage = new Image("/image-content/" + image.getFilename(), image.getTitle());
+        Image fullImage = new Image(buildImageContentUrl(image.getFilename()), image.getTitle());
         fullImage.setSizeFull();
         fullImage.getStyle().set("object-fit", "contain");
 
@@ -408,5 +404,9 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         final String[] units = new String[]{"B", "KB", "MB", "GB"};
         int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(bytes / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+
+    private String buildImageContentUrl(String filename) {
+        return IMAGE_CONTENT_BASE_PATH + filename;
     }
 }
