@@ -26,6 +26,7 @@ public class ImageCard extends VerticalLayout {
 
     private final GalleryImage image;
     private final Consumer<GalleryImage> onDeleteCallback;
+    private final Consumer<GalleryImage> onEditCallback;
     private final Consumer<GalleryImage> onSelectCallback;
     private final boolean showFilename;
     private final boolean compact;
@@ -34,20 +35,21 @@ public class ImageCard extends VerticalLayout {
     private HorizontalLayout compactContainer;
 
     public ImageCard(GalleryImage image, Consumer<GalleryImage> onDeleteCallback) {
-        this(image, onDeleteCallback, null, true, false);
+        this(image, onDeleteCallback, null, null, true, false);
     }
 
     public ImageCard(GalleryImage image, Consumer<GalleryImage> onDeleteCallback, Consumer<GalleryImage> onSelectCallback) {
-        this(image, onDeleteCallback, onSelectCallback, true, false);
+        this(image, onDeleteCallback, null, onSelectCallback, true, false);
     }
 
     public ImageCard(GalleryImage image, Consumer<GalleryImage> onDeleteCallback, Consumer<GalleryImage> onSelectCallback, boolean showFilename) {
-        this(image, onDeleteCallback, onSelectCallback, showFilename, false);
+        this(image, onDeleteCallback, null, onSelectCallback, showFilename, false);
     }
 
-    public ImageCard(GalleryImage image, Consumer<GalleryImage> onDeleteCallback, Consumer<GalleryImage> onSelectCallback, boolean showFilename, boolean compact) {
+    public ImageCard(GalleryImage image, Consumer<GalleryImage> onDeleteCallback, Consumer<GalleryImage> onEditCallback, Consumer<GalleryImage> onSelectCallback, boolean showFilename, boolean compact) {
         this.image = Objects.requireNonNull(image, "image must not be null");
         this.onDeleteCallback = onDeleteCallback;
+        this.onEditCallback = onEditCallback;
         this.onSelectCallback = onSelectCallback;
         this.showFilename = showFilename;
         this.compact = compact;
@@ -116,17 +118,31 @@ public class ImageCard extends VerticalLayout {
             content.add(title);
         }
 
+        HorizontalLayout actions = new HorizontalLayout();
+        actions.setPadding(false);
+        actions.setSpacing(false);
+        actions.setWidthFull();
+        actions.setJustifyContentMode(JustifyContentMode.END);
+
+        boolean hasActions = false;
+
+        if (onEditCallback != null) {
+            Button editButton = new Button("Edit", new Icon(VaadinIcon.EDIT));
+            editButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            editButton.addClickListener(event -> onEditCallback.accept(image));
+            actions.add(editButton);
+            hasActions = true;
+        }
+
         if (onDeleteCallback != null) {
             Button deleteButton = new Button("Delete", new Icon(VaadinIcon.TRASH));
             deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
-            deleteButton.setWidthFull();
             deleteButton.addClickListener(event -> onDeleteCallback.accept(image));
+            actions.add(deleteButton);
+            hasActions = true;
+        }
 
-            HorizontalLayout actions = new HorizontalLayout(deleteButton);
-            actions.setPadding(false);
-            actions.setSpacing(false);
-            actions.setWidthFull();
-            actions.setJustifyContentMode(JustifyContentMode.END);
+        if (hasActions) {
             content.add(actions);
         }
 
@@ -191,7 +207,30 @@ public class ImageCard extends VerticalLayout {
                 .set("color", "var(--lumo-secondary-text-color)");
 
         textInfo.add(titleSpan, timeText);
-        compactContainer.add(preview, textInfo);
+
+        HorizontalLayout actions = new HorizontalLayout();
+        actions.setPadding(false);
+        actions.setSpacing(false);
+        actions.setJustifyContentMode(JustifyContentMode.END);
+        actions.getStyle().set("flex-shrink", "0");
+
+        if (onEditCallback != null) {
+            Button editButton = new Button(new Icon(VaadinIcon.EDIT));
+            editButton.getElement().setAttribute("aria-label", "Edit image");
+            editButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
+            editButton.addClickListener(event -> onEditCallback.accept(image));
+            actions.add(editButton);
+        }
+
+        if (onDeleteCallback != null) {
+            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
+            deleteButton.getElement().setAttribute("aria-label", "Delete image");
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
+            deleteButton.addClickListener(event -> onDeleteCallback.accept(image));
+            actions.add(deleteButton);
+        }
+
+        compactContainer.add(preview, textInfo, actions);
         add(compactContainer);
     }
 

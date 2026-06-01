@@ -19,6 +19,8 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -30,6 +32,7 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.spring.security.AuthenticationContext;
+import com.vaadin.flow.component.textfield.TextField;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -297,7 +300,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
 
         // Render scrollable list of compact cards
         images.forEach(image -> {
-            ImageCard card = new ImageCard(image, null, this::selectImage, false, true);
+            ImageCard card = new ImageCard(image, null, this::openEditDialog, this::selectImage, false, true);
             card.setSelected(image.getId().equals(selectedImageId));
             sidebarCardsList.add(card);
             sidebarList.add(card);
@@ -397,6 +400,58 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
                     confirmDialog.getFooter().add(cancelBtn, deleteConfirmBtn);
                     confirmDialog.open();
                 });
+    }
+
+    private void openEditDialog(GalleryImage image) {
+        if (image == null) {
+            return;
+        }
+
+        Dialog editDialog = new Dialog();
+        editDialog.setHeaderTitle("Edit Image Title");
+        editDialog.setWidth("420px");
+        editDialog.setMaxWidth("90vw");
+        editDialog.setCloseOnEsc(true);
+        editDialog.setCloseOnOutsideClick(true);
+
+        VerticalLayout dialogBody = new VerticalLayout();
+        dialogBody.setPadding(true);
+        dialogBody.setSpacing(true);
+        dialogBody.setWidthFull();
+
+        TextField titleField = new TextField("Image Title");
+        titleField.setWidthFull();
+        titleField.setValue(image.getTitle() != null ? image.getTitle() : "");
+        titleField.setClearButtonVisible(true);
+        titleField.setPlaceholder("Enter a new title");
+
+        dialogBody.add(titleField);
+        editDialog.add(dialogBody);
+
+        Button cancelButton = new Button("Cancel", event -> editDialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        Button saveButton = new Button("Save", event -> {
+            String updatedTitle = titleField.getValue();
+            if (updatedTitle == null || updatedTitle.isBlank()) {
+                Notification.show("Please enter a title before saving.", 2500, Position.TOP_END)
+                        .addThemeVariants(com.vaadin.flow.component.notification.NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            imageService.updateImageTitle(image, updatedTitle);
+            if (image.getId() != null && image.getId().equals(selectedImageId)) {
+                selectedImageId = image.getId();
+            }
+
+            editDialog.close();
+            refreshGallery();
+            ComponentUtil.fireEvent(UI.getCurrent(), new ImageChangedEvent(UI.getCurrent()));
+        });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        editDialog.getFooter().add(cancelButton, saveButton);
+        editDialog.open();
     }
 
     private String formatFileSize(long bytes) {
