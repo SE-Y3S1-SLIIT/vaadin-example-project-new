@@ -243,6 +243,6 @@ public class ImageCard extends VerticalLayout {
         if (filename == null || filename.isBlank()) {
             return "";
         }
-        return "/uploads/" + filename;
+        return "/image-content/" + filename;
     }
 }

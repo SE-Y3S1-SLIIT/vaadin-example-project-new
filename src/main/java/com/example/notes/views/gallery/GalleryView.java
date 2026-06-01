@@ -328,7 +328,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         previewCard.setVisible(true);
         emptyGalleryState.setVisible(false);
 
-        largeImagePreview.setSrc("/uploads/" + image.getFilename());
+        largeImagePreview.setSrc("/image-content/" + image.getFilename());
         largeImagePreview.setAlt(image.getTitle());
 
         imageTitle.setText(image.getTitle());
@@ -347,7 +347,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
             metaSize.setText("Unknown size");
         }
 
-        downloadAnchor.setHref("/uploads/" + image.getFilename());
+        downloadAnchor.setHref("/image-content/" + image.getFilename());
     }
 
     private void showEmptyPreviewState() {
@@ -362,7 +362,7 @@ public class GalleryView extends HorizontalLayout implements BeforeEnterObserver
         lightbox.setWidth("90vw");
         lightbox.setHeight("90vh");
 
-        Image fullImage = new Image("/uploads/" + image.getFilename(), image.getTitle());
+        Image fullImage = new Image("/image-content/" + image.getFilename(), image.getTitle());
         fullImage.setSizeFull();
         fullImage.getStyle().set("object-fit", "contain");
 
